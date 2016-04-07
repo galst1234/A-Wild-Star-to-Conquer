@@ -81,12 +81,18 @@ end
 
 -- on SlashCommand "/CurrencyCounter"
 function SessionCurrencyCounter:OnSessionCurrencyCounterOn()
+	local drPlayer = GameLib.GetPlayerUnit()
+	local strName = drPlayer and drPlayer:GetName() or "player"
+	
+	self.wndMain:FindChild("Text"):SetText("This addon was created by " .. strName .. ".")
+
 	self.wndMain:Invoke() -- show the window
 end
 
 -- on timer
 function SessionCurrencyCounter:OnTimer()
 	-- Do your timer-related stuff here.
+	print("This sentence will be printed to the Debug channel every one second.")
 end
 
 
