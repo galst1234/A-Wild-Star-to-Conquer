@@ -92,7 +92,7 @@ end
 -- on timer
 function SessionCurrencyCounter:OnTimer()
 	-- Do your timer-related stuff here.
-	print("This sentence will be printed to the Debug channel every one second.")
+	Print("This sentence will be printed to the Debug channel every one second.")
 end
 
 
