@@ -23,6 +23,8 @@ function SessionCurrencyCounter:new(o)
     setmetatable(o, self)
     self.__index = self 
 
+	self.currentMoney = 0
+
     -- initialize variables here
 
     return o
@@ -68,7 +70,9 @@ function SessionCurrencyCounter:OnDocLoaded()
 		-- e.g. Apollo.RegisterEventHandler("KeyDown", "OnKeyDown", self)
 		Apollo.RegisterSlashCommand("CurrencyCounter", "OnSessionCurrencyCounterOn", self)
 
-		self.timer = ApolloTimer.Create(1.0, true, "OnTimer", self)
+		self.timer = ApolloTimer.Create(5.0, true, "OnTimer", self)
+		
+		Apollo.RegisterEventHandler("monLoot", "RaiseMoneyCounter", self)
 
 		-- Do additional Addon initialization here
 	end
@@ -81,20 +85,20 @@ end
 
 -- on SlashCommand "/CurrencyCounter"
 function SessionCurrencyCounter:OnSessionCurrencyCounterOn()
-	local drPlayer = GameLib.GetPlayerUnit()
-	local strName = drPlayer and drPlayer:GetName() or "player"
-	
-	self.wndMain:FindChild("Text"):SetText("This addon was created by " .. strName .. ".")
 
 	self.wndMain:Invoke() -- show the window
 end
 
 -- on timer
 function SessionCurrencyCounter:OnTimer()
+	Print(self.currentMoney)
 	-- Do your timer-related stuff here.
-	Print("This sentence will be printed to the Debug channel every one second.")
 end
 
+-- raise money; monLoot event handler
+function SessionCurrencyCounter:RaiseMoneyCounter(eType, tEventArgs)
+	self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
+end
 
 -----------------------------------------------------------------------------------------------
 -- SessionCurrencyCounterForm Functions
