@@ -84,7 +84,8 @@ function SessionCurrencyCounter:OnDocLoaded()
 		
 		Apollo.RegisterEventHandler("ChannelUpdate_Loot", "RaiseMoneyCounter", self)
 		
-		Apollo.RegisterSlashCommand("CurrencyCounter_reset", "ResetMoneyCounter", self)
+		Apollo.RegisterSlashCommand("curc_reset", "ResetMoneyCounter", self)
+		Apollo.RegisterSlashCommand("curc_set", "SetMoneyCounter", self)
 
 		-- Do additional Addon initialization here
 	end
@@ -113,7 +114,7 @@ function SessionCurrencyCounter:RaiseMoneyCounter(eType, tEventArgs)
 	if eType == Item.CodeEnumLootItemType.Cash then
 		Print("Received chash")
 		self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
-		self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, true)
+		self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, false)
 	end
 end
 
@@ -121,6 +122,11 @@ end
 function SessionCurrencyCounter:ResetMoneyCounter()
 	self.currentMoney = 0
 	self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, true)
+end
+
+-- Set counter
+function SessionCurrencyCounter:SetMoneyCounter(strCmd, strArgs)
+	Print("Set recevied: " .. strArgs)
 end
 
 -----------------------------------------------------------------------------------------------
@@ -136,6 +142,18 @@ function SessionCurrencyCounter:OnCancel()
 	self.wndMain:Close() -- hide the window
 end
 
+
+function SessionCurrencyCounter:MoveableChecked( wndHandler, wndControl, eMouseButton )
+	self.wndCounter:SetStyle("Moveable", true)
+end
+
+function SessionCurrencyCounter:MoveableUnchecked( wndHandler, wndControl, eMouseButton )
+	self.wndCounter:SetStyle("Moveable", false)
+end
+
+function SessionCurrencyCounter:ResetMoneyCounterButton( wndHandler, wndControl, eMouseButton )
+	self:ResetMoneyCounter()
+end
 
 -----------------------------------------------------------------------------------------------
 -- SessionCurrencyCounter Instance
