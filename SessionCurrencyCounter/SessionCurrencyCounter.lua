@@ -72,7 +72,7 @@ function SessionCurrencyCounter:OnDocLoaded()
 
 		self.timer = ApolloTimer.Create(5.0, true, "OnTimer", self)
 		
-		Apollo.RegisterEventHandler("monLoot", "RaiseMoneyCounter", self)
+		Apollo.RegisterEventHandler("ChannelUpdate_Loot", "RaiseMoneyCounter", self)
 
 		-- Do additional Addon initialization here
 	end
@@ -97,7 +97,11 @@ end
 
 -- raise money; monLoot event handler
 function SessionCurrencyCounter:RaiseMoneyCounter(eType, tEventArgs)
-	self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
+	Print("Received loot")
+	if eType == Item.CodeEnumLootItemType.Cash then
+		Print("Received chash")
+		self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
+	end
 end
 
 -----------------------------------------------------------------------------------------------
