@@ -57,7 +57,8 @@ function SessionCurrencyCounter:OnDocLoaded()
 	if self.xmlDoc ~= nil and self.xmlDoc:IsLoaded() then
 	    self.wndMain = Apollo.LoadForm(self.xmlDoc, "SessionCurrencyCounterForm", nil, self)
 		if self.wndMain == nil then
-			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.")
+			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.\n"
+				.. "Try reloadint the UI.")
 			return
 		end
 		
@@ -65,7 +66,8 @@ function SessionCurrencyCounter:OnDocLoaded()
 		
 		self.wndCounter = Apollo.LoadForm(self.xmlDoc, "Counter", nil, self)
 		if self.wndCounter == nil then
-			Apollo.AddAddonErrorText(self, "Could not load the counter window for some reason.")
+			Apollo.AddAddonErrorText(self, "Could not load the counter window for some reason\n"
+				.. "Try reloadint the UI.")
 			return
 		end
 		
@@ -111,12 +113,14 @@ function SessionCurrencyCounter:RaiseMoneyCounter(eType, tEventArgs)
 	if eType == Item.CodeEnumLootItemType.Cash then
 		Print("Received chash")
 		self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
+		self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, true)
 	end
 end
 
 -- Reset counter
 function SessionCurrencyCounter:ResetMoneyCounter()
 	self.currentMoney = 0
+	self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, true)
 end
 
 -----------------------------------------------------------------------------------------------
