@@ -62,6 +62,14 @@ function SessionCurrencyCounter:OnDocLoaded()
 		end
 		
 	    self.wndMain:Show(false, true)
+		
+		self.wndCounter = Apollo.LoadForm(self.xmlDoc, "Counter", nil, self)
+		if self.wndCounter == nil then
+			Apollo.AddAddonErrorText(self, "Could not load the counter window for some reason.")
+			return
+		end
+		
+		self.wndCounter:Show(true, true)
 
 		-- if the xmlDoc is no longer needed, you should set it to nil
 		-- self.xmlDoc = nil
@@ -73,6 +81,8 @@ function SessionCurrencyCounter:OnDocLoaded()
 		self.timer = ApolloTimer.Create(5.0, true, "OnTimer", self)
 		
 		Apollo.RegisterEventHandler("ChannelUpdate_Loot", "RaiseMoneyCounter", self)
+		
+		Apollo.RegisterSlashCommand("CurrencyCounter_reset", "ResetMoneyCounter", self)
 
 		-- Do additional Addon initialization here
 	end
@@ -95,13 +105,18 @@ function SessionCurrencyCounter:OnTimer()
 	-- Do your timer-related stuff here.
 end
 
--- raise money; monLoot event handler
+-- raise money; ChannelUpdate_Loot event handler
 function SessionCurrencyCounter:RaiseMoneyCounter(eType, tEventArgs)
 	Print("Received loot")
 	if eType == Item.CodeEnumLootItemType.Cash then
 		Print("Received chash")
 		self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
 	end
+end
+
+-- Reset counter
+function SessionCurrencyCounter:ResetMoneyCounter()
+	self.currentMoney = 0
 end
 
 -----------------------------------------------------------------------------------------------
