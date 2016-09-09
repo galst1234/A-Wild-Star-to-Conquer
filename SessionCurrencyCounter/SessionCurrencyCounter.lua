@@ -126,6 +126,7 @@ end
 
 -- Reset counter
 function SessionCurrencyCounter:ResetMoneyCounter()
+	if self.debug then Print("Reset counter") end
 	self.currentMoney = 0
 	self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, true)
 end
@@ -150,6 +151,9 @@ function SessionCurrencyCounter:OnCancel()
 	self.wndMain:Close() -- hide the window
 end
 
+-- when the Apply button is clicked
+function SessionCurrencyCounter:OnApply( wndHandler, wndControl, eMouseButton )
+end
 
 function SessionCurrencyCounter:MoveableChecked( wndHandler, wndControl, eMouseButton )
 	self.wndCounter:SetStyle("Moveable", true)
@@ -170,6 +174,7 @@ end
 function SessionCurrencyCounter:DebugUnchecked( wndHandler, wndControl, eMouseButton )
 	self.debug = false
 end
+
 
 -----------------------------------------------------------------------------------------------
 -- SessionCurrencyCounter Instance
