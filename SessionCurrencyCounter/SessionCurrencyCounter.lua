@@ -24,6 +24,7 @@ function SessionCurrencyCounter:new(o)
     self.__index = self 
 
 	self.currentMoney = 0
+	self.debug = false
 
     -- initialize variables here
 
@@ -104,17 +105,22 @@ end
 
 -- on timer
 function SessionCurrencyCounter:OnTimer()
-	Print(self.currentMoney)
+	if self.debug then
+		Print(self.currentMoney)
+	end
 	-- Do your timer-related stuff here.
 end
 
 -- raise money; ChannelUpdate_Loot event handler
 function SessionCurrencyCounter:RaiseMoneyCounter(eType, tEventArgs)
-	Print("Received loot")
+	if self.debug then Print("Received loot") end
 	if eType == Item.CodeEnumLootItemType.Cash then
-		Print("Received chash")
-		self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
-		self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, false)
+		if self.debug then Print("Received currency", tEventArgs.monNew:GetMoneyType()) end
+		if tEventArgs.monNew:GetMoneyType() == Money.CodeEnumCurrencyType.Credits then
+			if self.debug then Print("Received cash") end
+			self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
+			self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, false)
+		end
 	end
 end
 
@@ -126,7 +132,9 @@ end
 
 -- Set counter
 function SessionCurrencyCounter:SetMoneyCounter(strCmd, strArgs)
-	Print("Set recevied: " .. strArgs)
+	if self.debug then
+		Print("Set recevied: " .. strArgs)
+	end
 end
 
 -----------------------------------------------------------------------------------------------
@@ -153,6 +161,14 @@ end
 
 function SessionCurrencyCounter:ResetMoneyCounterButton( wndHandler, wndControl, eMouseButton )
 	self:ResetMoneyCounter()
+end
+
+function SessionCurrencyCounter:DebugChecked( wndHandler, wndControl, eMouseButton )
+	self.debug = true
+end
+
+function SessionCurrencyCounter:DebugUnchecked( wndHandler, wndControl, eMouseButton )
+	self.debug = false
 end
 
 -----------------------------------------------------------------------------------------------
