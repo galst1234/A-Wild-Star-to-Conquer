@@ -57,11 +57,21 @@ function SessionCurrencyCounter:OnDocLoaded()
 	if self.xmlDoc ~= nil and self.xmlDoc:IsLoaded() then
 	    self.wndMain = Apollo.LoadForm(self.xmlDoc, "SessionCurrencyCounterForm", nil, self)
 		if self.wndMain == nil then
-			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.")
+			Apollo.AddAddonErrorText(self, "Could not load the main window for some reason.\n"
+				.. "Try reloadint the UI.")
 			return
 		end
 		
 	    self.wndMain:Show(false, true)
+		
+		self.wndCounter = Apollo.LoadForm(self.xmlDoc, "Counter", nil, self)
+		if self.wndCounter == nil then
+			Apollo.AddAddonErrorText(self, "Could not load the counter window for some reason\n"
+				.. "Try reloadint the UI.")
+			return
+		end
+		
+		self.wndCounter:Show(true, true)
 
 		-- if the xmlDoc is no longer needed, you should set it to nil
 		-- self.xmlDoc = nil
@@ -73,6 +83,9 @@ function SessionCurrencyCounter:OnDocLoaded()
 		self.timer = ApolloTimer.Create(5.0, true, "OnTimer", self)
 		
 		Apollo.RegisterEventHandler("ChannelUpdate_Loot", "RaiseMoneyCounter", self)
+		
+		Apollo.RegisterSlashCommand("curc_reset", "ResetMoneyCounter", self)
+		Apollo.RegisterSlashCommand("curc_set", "SetMoneyCounter", self)
 
 		-- Do additional Addon initialization here
 	end
@@ -95,13 +108,25 @@ function SessionCurrencyCounter:OnTimer()
 	-- Do your timer-related stuff here.
 end
 
--- raise money; monLoot event handler
+-- raise money; ChannelUpdate_Loot event handler
 function SessionCurrencyCounter:RaiseMoneyCounter(eType, tEventArgs)
 	Print("Received loot")
 	if eType == Item.CodeEnumLootItemType.Cash then
 		Print("Received chash")
 		self.currentMoney = self.currentMoney + tEventArgs.monNew:GetAmount() -- Find the new money thing
+		self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, false)
 	end
+end
+
+-- Reset counter
+function SessionCurrencyCounter:ResetMoneyCounter()
+	self.currentMoney = 0
+	self.wndCounter:FindChild("CashWindow"):SetAmount(self.currentMoney, true)
+end
+
+-- Set counter
+function SessionCurrencyCounter:SetMoneyCounter(strCmd, strArgs)
+	Print("Set recevied: " .. strArgs)
 end
 
 -----------------------------------------------------------------------------------------------
@@ -117,6 +142,18 @@ function SessionCurrencyCounter:OnCancel()
 	self.wndMain:Close() -- hide the window
 end
 
+
+function SessionCurrencyCounter:MoveableChecked( wndHandler, wndControl, eMouseButton )
+	self.wndCounter:SetStyle("Moveable", true)
+end
+
+function SessionCurrencyCounter:MoveableUnchecked( wndHandler, wndControl, eMouseButton )
+	self.wndCounter:SetStyle("Moveable", false)
+end
+
+function SessionCurrencyCounter:ResetMoneyCounterButton( wndHandler, wndControl, eMouseButton )
+	self:ResetMoneyCounter()
+end
 
 -----------------------------------------------------------------------------------------------
 -- SessionCurrencyCounter Instance
