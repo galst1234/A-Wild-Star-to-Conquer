@@ -25,6 +25,11 @@ function SessionCurrencyCounter:new(o)
 
 	self.currentMoney = 0
 	self.debug = false
+	self.tOptions = {
+		moveable = false,
+		prevMoveable = false,
+		debug = false
+	}
 
     -- initialize variables here
 
@@ -138,29 +143,43 @@ function SessionCurrencyCounter:SetMoneyCounter(strCmd, strArgs)
 	end
 end
 
+function SessionCurrencyCounter:ApplySettings(owner)
+	owner.wndCounter:SetStyle("Moveable", owner.tOptions.moveable)
+	owner.debug = owner.tOptions.debug
+	owner.tOptions.prevMoveable = owner.tOptions.moveable
+end
+
 -----------------------------------------------------------------------------------------------
 -- SessionCurrencyCounterForm Functions
 -----------------------------------------------------------------------------------------------
 -- when the OK button is clicked
 function SessionCurrencyCounter:OnOK()
+	SessionCurrencyCounter:ApplySettings(self)
 	self.wndMain:Close() -- hide the window
 end
 
 -- when the Cancel button is clicked
 function SessionCurrencyCounter:OnCancel()
+	self.tOptions.debug = self.debug
+	self.tOptions.moveable = self.tOptions.prevMoveable
+	self.wndMain:FindChild("Moveable"):SetValue(self.tOptions.moveable) TODO: Set checkbox value
+--	self.wndMain:FindChild("Debug"):SetData(self.debug)
 	self.wndMain:Close() -- hide the window
 end
 
 -- when the Apply button is clicked
 function SessionCurrencyCounter:OnApply( wndHandler, wndControl, eMouseButton )
+	SessionCurrencyCounter:ApplySettings(self)
 end
 
 function SessionCurrencyCounter:MoveableChecked( wndHandler, wndControl, eMouseButton )
-	self.wndCounter:SetStyle("Moveable", true)
+	--self.wndCounter:SetStyle("Moveable", true)
+	self.tOptions.moveable = true
 end
 
 function SessionCurrencyCounter:MoveableUnchecked( wndHandler, wndControl, eMouseButton )
-	self.wndCounter:SetStyle("Moveable", false)
+	--self.wndCounter:SetStyle("Moveable", false)
+	self.tOptions.moveable = false
 end
 
 function SessionCurrencyCounter:ResetMoneyCounterButton( wndHandler, wndControl, eMouseButton )
@@ -168,13 +187,12 @@ function SessionCurrencyCounter:ResetMoneyCounterButton( wndHandler, wndControl,
 end
 
 function SessionCurrencyCounter:DebugChecked( wndHandler, wndControl, eMouseButton )
-	self.debug = true
+	self.tOptions.debug = true
 end
 
 function SessionCurrencyCounter:DebugUnchecked( wndHandler, wndControl, eMouseButton )
-	self.debug = false
+	self.tOptions.debug = false
 end
-
 
 -----------------------------------------------------------------------------------------------
 -- SessionCurrencyCounter Instance
